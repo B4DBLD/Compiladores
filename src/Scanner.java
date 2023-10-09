@@ -1,3 +1,4 @@
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,9 +36,11 @@ public class Scanner {
     public List<Token> scan() throws Exception {
         String lexema = "";
         int estado = 0;
+        int linea = 1;
+        String cadenaLimpia = "";
         char c;
 
-        for(int i=0; i<source.length(); i++){
+        leerCadena: for(int i=0; i<source.length(); i++){
             c = source.charAt(i);
 
             switch (estado){
@@ -69,7 +72,52 @@ public class Scanner {
                         estado = 19;
                         lexema += c;
                         
+                    } else if (c == '+') {
+                        estado = 24;
+                        lexema += c;
+
+                    } else if (c == '-') {
+                        estado = 25;
+                        lexema += c;
+
+                    } else if (c == '*') {
+                        estado = 26;
+                        lexema += c;
+
+                    } else if (c == '{') {
+                        estado = 27;
+                        lexema += c;
+                    } else if (c == '}') {
+                        estado = 28;
+                        lexema += c;
+                    } else if (c == '(') {
+                        estado = 29;
+                        lexema += c;
+                    } else if ( c == ')') {
+                        estado = 30;
+                        lexema += c;
+                    } else if (c == ',') {
+                        estado = 31;
+                        lexema += c;
+                    } else if (c == '.') {
+                        estado = 32;
+                        lexema += c;
+                    } else if (c == ';') {
+                        estado = 33;
+                        lexema += c;
+                    } else if (c == '\n') {
+                        linea++;
                     }
+                    else {
+                        if (c != '\n' && c != '\r' && c != '\t' && c != ' ' ) {
+                            Interprete.error(linea, "Error lexico, caracter invalido");
+                            estado = 0;
+                            lexema = "";
+                            break leerCadena;
+                        }
+                    }
+
+
                     break;
                 case 1:
                     if(c == '='){
@@ -219,6 +267,7 @@ public class Scanner {
 
                         estado = 0;
                         lexema = "";
+                        i--;
                     }
                     break;
                 case 12:
@@ -263,7 +312,8 @@ public class Scanner {
                         estado = 16;
                         lexema += c;
                     } else {
-                        Token t = new Token(TipoToken.NUMBER, lexema, Double.valueOf(lexema));
+                        BigDecimal exponente = new BigDecimal(lexema);
+                        Token t = new Token(TipoToken.NUMBER, lexema, exponente.toPlainString());
                         tokens.add(t);
 
                         estado = 0;
@@ -273,7 +323,11 @@ public class Scanner {
                     break;
                 case 17:
                     if (c == '\n') {
-                        Interprete.error(i+1, "Error lexico, Se esperaba un caracter valido en su lugar se obtuvo un salto de linea");
+                        Interprete.error(linea, "Error lexico, Se esperaba un caracter valido en su lugar se obtuvo un salto de linea");
+                        estado = 0;
+                        lexema = "";
+                        i--;
+                        break leerCadena;
                     } else if (c == '"'){
                         estado = 18;
                         lexema += c;
@@ -285,9 +339,9 @@ public class Scanner {
 
                     break;
                 case 18:
-                    Token s = new Token(TipoToken.STRING, lexema, String.valueOf(lexema));
+                    cadenaLimpia = lexema.substring(1, lexema.length()-1);
+                    Token s = new Token(TipoToken.STRING, lexema, cadenaLimpia);
                     tokens.add(s);
-
                     estado = 0;
                     lexema = "";
                     i--;
@@ -319,7 +373,9 @@ public class Scanner {
                         break;
                 case 20:
                     if (c == '\n'){
-                        lexema += c;
+                        estado = 0;
+                        lexema = "";
+                        i--;
                     }else {
                         estado = 20;
                         lexema += c;
@@ -348,6 +404,149 @@ public class Scanner {
                     break;
                 case 23:
                     //No genera token
+                    estado = 0;
+                    lexema = "";
+                    i--;
+                    break;
+                case 24:
+                    TipoToken pt = palabrasReservadas.get(lexema);
+                    if(pt == null){
+                        Token ptt  = new Token(TipoToken.PLUS, lexema);
+                        tokens.add(ptt);
+                    }
+                    else{
+                        Token t = new Token(pt, lexema);
+                        tokens.add(t);
+                    }
+                    estado = 0;
+                    lexema = "";
+                    i--;
+                    break;
+                case 25:
+                    TipoToken mt = palabrasReservadas.get(lexema);
+                    if(mt == null){
+                        Token mtt  = new Token(TipoToken.MINUS, lexema);
+                        tokens.add(mtt);
+                    }
+                    else{
+                        Token t = new Token(mt, lexema);
+                        tokens.add(t);
+                    }
+                    estado = 0;
+                    lexema = "";
+                    i--;
+                    break;
+                case 26:
+                    TipoToken ast = palabrasReservadas.get(lexema);
+                    if(ast == null){
+                        Token astt  = new Token(TipoToken.STAR, lexema);
+                        tokens.add(astt);
+                    }
+                    else{
+                        Token t = new Token(ast, lexema);
+                        tokens.add(t);
+                    }
+                    estado = 0;
+                    lexema = "";
+                    i--;
+                    break;
+                case 27:
+                    TipoToken lb = palabrasReservadas.get(lexema);
+                    if(lb == null){
+                        Token lbt  = new Token(TipoToken.LEFT_BRACE, lexema);
+                        tokens.add(lbt);
+                    }
+                    else{
+                        Token t = new Token(lb, lexema);
+                        tokens.add(t);
+                    }
+                    estado = 0;
+                    lexema = "";
+                    i--;
+                    break;
+                case 28:
+                    TipoToken rb = palabrasReservadas.get(lexema);
+                    if(rb == null){
+                        Token rbt  = new Token(TipoToken.RIGHT_BRACE, lexema);
+                        tokens.add(rbt);
+                    }
+                    else{
+                        Token t = new Token(rb, lexema);
+                        tokens.add(t);
+                    }
+                    estado = 0;
+                    lexema = "";
+                    i--;
+                    break;
+                case 29:
+                    TipoToken lp = palabrasReservadas.get(lexema);
+                    if(lp == null){
+                        Token lpt  = new Token(TipoToken.LEFT_PAREN, lexema);
+                        tokens.add(lpt);
+                    }
+                    else{
+                        Token t = new Token(lp, lexema);
+                        tokens.add(t);
+                    }
+                    estado = 0;
+                    lexema = "";
+                    i--;
+                    break;
+                case 30:
+                    TipoToken rp = palabrasReservadas.get(lexema);
+                    if(rp == null){
+                        Token rpt  = new Token(TipoToken.RIGHT_PAREN, lexema);
+                        tokens.add(rpt);
+                    }
+                    else{
+                        Token t = new Token(rp, lexema);
+                        tokens.add(t);
+                    }
+                    estado = 0;
+                    lexema = "";
+                    i--;
+                    break;
+                case 31:
+                    TipoToken cm = palabrasReservadas.get(lexema);
+                    if(cm == null){
+                        Token cmt  = new Token(TipoToken.COMMA, lexema);
+                        tokens.add(cmt);
+                    }
+                    else{
+                        Token t = new Token(cm, lexema);
+                        tokens.add(t);
+                    }
+                    estado = 0;
+                    lexema = "";
+                    i--;
+                    break;
+                case 32:
+                    TipoToken dt = palabrasReservadas.get(lexema);
+                    if(dt == null){
+                        Token dtt  = new Token(TipoToken.DOT, lexema);
+                        tokens.add(dtt);
+                    }
+                    else{
+                        Token t = new Token(dt, lexema);
+                        tokens.add(t);
+                    }
+                    estado = 0;
+                    lexema = "";
+                    i--;
+                    break;
+                case 33:
+                    TipoToken sct = palabrasReservadas.get(lexema);
+                    if(sct == null){
+                        Token sctt  = new Token(TipoToken.SEMICOLON, lexema);
+                        tokens.add(sctt);
+                    }
+                    else{
+                        Token t = new Token(sct, lexema);
+                        tokens.add(t);
+                    }estado = 0;
+                    lexema = "";
+                    i--;
+
                     break;
 
 

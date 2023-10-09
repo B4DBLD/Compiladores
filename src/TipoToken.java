@@ -9,6 +9,7 @@ public enum TipoToken {
     GREATER, GREATER_EQUAL,
     LESS, LESS_EQUAL,
 
+
     // Literales
     IDENTIFIER, STRING, NUMBER,
 
