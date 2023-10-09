@@ -1,3 +1,8 @@
+/*
+Ávila Juárez Alexis Aramis
+Pérez Ortiz Saúl
+Spindola Reyes Arturo Israel
+ */
 public class Token {
 
     final TipoToken tipo;

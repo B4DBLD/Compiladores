@@ -1,3 +1,9 @@
+/*
+Ávila Juárez Alexis Aramis
+Pérez Ortiz Saúl
+Spindola Reyes Arturo Israel
+ */
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
