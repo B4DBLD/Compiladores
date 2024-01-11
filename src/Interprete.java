@@ -4,6 +4,7 @@ Pérez Ortiz Saúl
 Spindola Reyes Arturo Israel
 
  */
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -55,9 +56,21 @@ public class Interprete {
             Scanner scanner = new Scanner(source);
             List<Token> tokens = scanner.scan();
 
-            for(Token token : tokens){
-                System.out.println(token);
-            }
+            ParserC ParserC = new ParserC(tokens);
+            ParserC.parse();
+
+            GenPostFija gpf = new GenPostFija(tokens);
+            List<Token> postfija = gpf.convertir();
+
+            GenAST gast = new GenAST(postfija);
+            Arbol programa = gast.GenAST();
+
+            programa.recorrer();
+
+
+            //for(Token token : tokens){
+            //    System.out.println(token);
+            //}
         }
         catch (Exception ex){
             ex.printStackTrace();

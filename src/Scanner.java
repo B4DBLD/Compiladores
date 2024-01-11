@@ -269,7 +269,7 @@ public class Scanner {
                         estado = 14;
                         lexema += c;
                     }else{
-                        Token t = new Token(TipoToken.NUMBER, lexema, Integer.valueOf(lexema));
+                        Token t = new Token(TipoToken.NUMBER, lexema, Integer.valueOf(lexema), linea);
                         tokens.add(t);
 
                         estado = 0;
@@ -291,7 +291,7 @@ public class Scanner {
                         estado = 14;
                         lexema += c;
                     }else {
-                        Token t = new Token(TipoToken.NUMBER, lexema, Double.valueOf(lexema));
+                        Token t = new Token(TipoToken.NUMBER, lexema, Double.valueOf(lexema), linea);
                         tokens.add(t);
 
                         estado = 0;
@@ -320,7 +320,7 @@ public class Scanner {
                         lexema += c;
                     } else {
                         BigDecimal exponente = new BigDecimal(lexema);
-                        Token t = new Token(TipoToken.NUMBER, lexema, exponente.toPlainString());
+                        Token t = new Token(TipoToken.NUMBER, lexema, exponente.toPlainString(), linea);
                         tokens.add(t);
 
                         estado = 0;
@@ -347,7 +347,7 @@ public class Scanner {
                     break;
                 case 18:
                     cadenaLimpia = lexema.substring(1, lexema.length()-1);
-                    Token s = new Token(TipoToken.STRING, lexema, cadenaLimpia);
+                    Token s = new Token(TipoToken.STRING, lexema, cadenaLimpia, linea);
                     tokens.add(s);
                     estado = 0;
                     lexema = "";
@@ -561,6 +561,8 @@ public class Scanner {
 
             }
         }
+        Token t = new Token(TipoToken.EOF, "");
+        tokens.add(t);
 
 
         return tokens;
